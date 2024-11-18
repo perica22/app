@@ -34,3 +34,19 @@ async def http_error_handler(_: Request, e: HTTPException) -> JSONResponse:
         },
         status_code=e.status_code
     )
+
+
+class UserNotFound(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=404,
+            detail="Requested user does not exist"
+        )
+
+
+class PostNotFound(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=404,
+            detail="Requested post does not exist"
+        )

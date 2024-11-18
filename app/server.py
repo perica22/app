@@ -2,9 +2,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app.utils.middleware import StarletteDBMiddleware
+from app.utils.middleware import DBMiddleware, AuditMiddleware
 from app.errors import generic_error_handler, http_error_handler
 from app.version import __version__
+from app.handler import user, post
 
 
 class Server:
@@ -14,12 +15,24 @@ class Server:
             version=__version__,
             default_response_class=JSONResponse
         )
+        self.app.include_router(
+            prefix="/api/posts",
+            tags=["roles"],
+            router=post.router
+        )
+        self.app.include_router(
+            prefix="/api/users",
+            tags=["users"],
+            router=user.router
+        )
+
         attach_middlewares(app=self.app)
         attach_error_handlers(app=self.app)
 
 
 def attach_middlewares(app: FastAPI):
-    app.add_middleware(StarletteDBMiddleware, only_success_commit=True)
+    app.add_middleware(DBMiddleware, only_success_commit=True)
+    app.add_middleware(AuditMiddleware, application='app')
 
 
 def attach_error_handlers(app: FastAPI):

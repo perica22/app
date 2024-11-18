@@ -2,7 +2,7 @@ import enum
 from uuid import uuid4
 from datetime import datetime
 
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, DateTime, String, ForeignKey, Text, Enum
 
@@ -36,3 +36,14 @@ class Post(Base):
     tags = relationship(
         "Tag", secondary=post_tags, back_populates="posts", lazy="raise"
     )
+
+    @classmethod
+    def get(cls, db: Session, post_id: str) -> 'Post':
+        query = db.query(cls).filter_by(
+            id=post_id
+        )
+        return query.one_or_none()
+
+    @classmethod
+    def list(cls, db: Session) -> list['Post']:
+        return db.query(cls).all()

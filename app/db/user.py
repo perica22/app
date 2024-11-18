@@ -1,7 +1,7 @@
 from uuid import uuid4
 from datetime import datetime
 
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import Column, DateTime, String
 
@@ -23,9 +23,12 @@ class User(Base):
     last_name = Column(String, nullable=False)
     email = Column(String, nullable=False)
 
-    posts = relationship(
-        "MemberPolicy", back_populates="member", lazy="raise"
-    )
-    comments = relationship(
-        "MemberRole", back_populates="member", lazy="raise"
-    )
+    posts = relationship("Post", back_populates="user", lazy="raise")
+    comments = relationship("Comment", back_populates="user", lazy="raise")
+
+    @classmethod
+    def get(cls, db: Session, user_id: str) -> 'User':
+        query = db.query(cls).filter_by(
+            id=user_id
+        )
+        return query.one_or_none()

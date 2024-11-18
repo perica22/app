@@ -25,7 +25,7 @@ def production(binder):
     # Bind configuration
 
     config = Config.from_application(
-        application="multipla", project_dir=PROJECT_DIR
+        application="app", project_dir=PROJECT_DIR
     )
     logger.info("Using config file: %s", config.path.config)
     binder.bind(Config, config)
@@ -52,16 +52,13 @@ def production(binder):
         connect_args={"connect_timeout": connect_timeout},
     )
     session_factory = sessionmaker(bind=engine)
-    async_session_class = scoped_session(
+    session_class = scoped_session(
         session_factory, scopefunc=current_task
     )
-    session_class = scoped_session(session_factory)
 
     binder.bind("db_registry", session_class)
     binder.bind_to_provider("db", session_class)
     binder.bind("db_engine", engine)
-    binder.bind("async_db_registry", async_session_class)
-    binder.bind_to_provider("async_db", async_session_class)
 
     # Bind server
     binder.bind_to_constructor(FastAPI, Server)
