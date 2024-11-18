@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request
 from app import event
 from app.schema import PostResponse
 from app.service import PostService
+from app.filter import PostStatusFilter
 
 router = APIRouter()
 
@@ -15,10 +16,15 @@ router = APIRouter()
     description="Provides list of posts with their details.",
     response_description="List of objects with post details."
 )
-def list_posts(request: Request) -> list[PostResponse]:
+def list_posts(
+    request: Request,
+    status_filter: PostStatusFilter = PostStatusFilter.inject(),
+) -> list[PostResponse]:
     posts = PostService(
         db=request.state.db,
-    ).list_posts()
+    ).list_posts(
+        status=status_filter.value
+    )
 
     request.state.audit(event=event.LIST_POSTS)
     return posts

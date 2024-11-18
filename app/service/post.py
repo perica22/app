@@ -1,9 +1,10 @@
 import logging
+from typing import Optional
 
 from sqlalchemy.orm.session import Session
 
 from app import errors
-from app.db import Post
+from app.db import Post, PostStatusType
 from app.schema import PostResponse
 
 logger = logging.getLogger(__name__)
@@ -22,8 +23,11 @@ class PostService:
             post=post
         )
 
-    def list_posts(self) -> list[PostResponse]:
-        posts = Post.list(db=self.db)
+    def list_posts(
+        self,
+        status: Optional[PostStatusType] = None
+    ) -> list[PostResponse]:
+        posts = Post.list(db=self.db, status=status)
         return [
             PostResponse.create(post=post) for post in posts
         ]

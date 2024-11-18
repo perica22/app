@@ -50,3 +50,11 @@ class PostNotFound(HTTPException):
             status_code=404,
             detail="Requested post does not exist"
         )
+
+
+class InvalidPostStatus(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=400,
+            detail="Provided post status is not valid"
+        )

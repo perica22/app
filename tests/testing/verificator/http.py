@@ -34,6 +34,7 @@ class HttpChecker:
     ok = p(_status_check, 200)
 
     # client error
+    bad_request = p(_status_check, 400)
     not_found = p(_status_check, 404)
 
 

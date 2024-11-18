@@ -1,6 +1,7 @@
 import enum
 from uuid import uuid4
 from datetime import datetime
+from typing import Optional
 
 from sqlalchemy.orm import relationship, Session
 from sqlalchemy.dialects.postgresql import UUID
@@ -14,6 +15,10 @@ class PostStatusType(enum.Enum):
     DRAFT = "DRAFT"
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
+
+    @classmethod
+    def all(cls):
+        return {status.value for status in cls}
 
 
 class Post(Base):
@@ -45,5 +50,10 @@ class Post(Base):
         return query.one_or_none()
 
     @classmethod
-    def list(cls, db: Session) -> list['Post']:
-        return db.query(cls).all()
+    def list(
+        cls, db: Session, status: Optional[PostStatusType] = None
+    ) -> list['Post']:
+        query = db.query(cls)
+        if status:
+            query = query.filter_by(status=status)
+        return query.all()
