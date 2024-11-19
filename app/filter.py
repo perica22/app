@@ -30,3 +30,26 @@ class PostStatusFilter:
     @classmethod
     def inject(cls) -> Any:
         return Depends(cls())
+
+
+class IncludeFilter:
+    """
+    This filter will be used for controlling content of http response, by
+    allowing clients to request some related entities to be included in the
+    response.
+    """
+    INCLUDE_QUERY = Query(
+        default=None,
+        description=(
+            "Request additional entities to be included in the response"
+        ),
+        examples=["comments,tags", "tags", "user"],
+    )
+
+    def __call__(self, include: str = INCLUDE_QUERY) -> "IncludeFilter":
+        self.value = include.split(",") if include is not None else []
+        return self
+
+    @classmethod
+    def inject(cls) -> Any:
+        return Depends(cls())

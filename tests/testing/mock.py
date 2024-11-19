@@ -3,31 +3,27 @@ from copy import deepcopy
 from app.utils.config import Config
 
 
-class ConfigMock:
-
+class ConfigMock(Config):
     def __init__(self, *args, **kwargs):
-        self._config = Config(
-            data={
-                'data_init_enabled': True,
-                'debug': True
-            },
-            *args,
-            **kwargs
-        )
-        self._config_copy = deepcopy(self._config)
-        # TODO
-        # dir_path = os.path.dirname(os.path.realpath(__file__))
-        # self.config.path.data_init = f'{dir_path}/data_init.json'
+        self._init_data = deepcopy(kwargs.get("data"))
+        super().__init__(*args, **kwargs)
+
+    def initialize_again(self):
+        self.__init__(data=self._init_data, path=self.path)
+
+
+class ConfigServiceMock:
+    def __init__(self, *args, **kwargs):
+        self._config = ConfigMock(*args, **kwargs)
 
     @property
     def config(self):
         return self._config
 
     def clean_up(self):
-        """Restores any changes made to configuration during testing."""
-        self._config = deepcopy(self._config_copy)
+        self._config.initialize_again()
 
 
-class AppServiceMock(ConfigMock):
+class AppServiceMock(ConfigServiceMock):
     def __init__(self):
         super().__init__()

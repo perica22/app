@@ -27,7 +27,7 @@ def production(binder):
     config = Config.from_application(
         application="app", project_dir=PROJECT_DIR
     )
-    logger.info("Using config file: %s", config.path.config)
+    logger.info(f"Using config file: {config.path.config}")
     binder.bind(Config, config)
 
     # Configure logging
@@ -62,9 +62,3 @@ def production(binder):
 
     # Bind server
     binder.bind_to_constructor(FastAPI, Server)
-
-    # bind shell
-    binder.bind("shell.namespace", {
-        "config": config,
-        "db": session_class(),
-    })

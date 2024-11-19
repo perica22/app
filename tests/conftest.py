@@ -1,3 +1,5 @@
+from asyncio import current_task
+
 import inject
 import pytest
 import contextlib
@@ -16,7 +18,9 @@ from tests.testing import AppServiceMock, AppPrecondition, AppVerificator
 
 
 def configure_env(
-    db_: testing.postgresql.Postgresql, binder: inject.Binder
+    db_: testing.postgresql.Postgresql,
+    mocks: AppServiceMock,
+    binder: inject.Binder,
 ) -> None:
     """
     Inject configuration for testing environment.
@@ -32,23 +36,31 @@ def configure_env(
     engine = create_engine(
         db_,
         encoding="utf-8",
-        isolation_level="REPEATABLE READ"
+        isolation_level="REPEATABLE READ",
+        echo=True
     )
     binder.bind("db_engine", engine)
     # expire_on_commit=False is here because sqlalchemy does not leave
     # objects in memory when session closes and it simplifies things a lot
     # for creating test data if these objects are left untouched.
-    session_class = scoped_session(
-        sessionmaker(bind=engine, expire_on_commit=False, autoflush=False)
+    session_factory = sessionmaker(
+        bind=engine, expire_on_commit=False, autoflush=False
     )
-    binder.bind("db_registry", session_class)
-    binder.bind_to_provider("db", session_class)
+    async_session_class = scoped_session(
+        session_factory=session_factory,
+        scopefunc=current_task
+    )
+    session_class = scoped_session(session_factory)
+
+    binder.bind("db_registry", async_session_class)
+    binder.bind_to_provider("db", async_session_class)
+    binder.bind("thread_db_registry", session_class)
+    binder.bind_to_provider("thread_db", session_class)
 
     # bind server
     binder.bind_to_constructor(FastAPI, Server)
-
     # bind services
-    binder.bind(Config, AppServiceMock.config)
+    binder.bind(Config, mocks.config)
     # TODO
     # dir_path = os.path.dirname(os.path.realpath(__file__))
     # binder.bind("DATA_INIT_FILE", f"{dir_path}/data_init.json")
@@ -101,15 +113,17 @@ def verify(mocks: AppServiceMock):
 
 
 @pytest.fixture(scope="session")
-def env(request) -> None:
+def env(request, mocks) -> None:
     """Initializes temporary database for API tests."""
+
+    mocks.config.initialize_again()
     postgres = testing.postgresql.Postgresql(
         initdb_args="-E=UTF-8 -U postgres -A trust"
     )
     request.addfinalizer(partial(env_kill, postgres))
     db_url = postgres.url()
 
-    inject.clear_and_configure(partial(configure_env, db_url))
+    inject.clear_and_configure(partial(configure_env, db_url, mocks))
 
 
 @pytest.fixture(scope="module")

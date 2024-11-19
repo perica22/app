@@ -15,7 +15,6 @@ def main(args):
     inject.configure(ioc.production)
 
     logger.info(f"Started app with arguments: {', '.join(args)}")
-
     server = inject.instance(FastAPI)
     config = inject.instance(Config)
     uvicorn.run(

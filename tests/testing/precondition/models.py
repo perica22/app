@@ -23,7 +23,7 @@ class UserMockPrecondition:
         default_data = self._default()
         if kwargs:
             default_data.update(kwargs)
-        db = inject.instance("db")
+        db = inject.instance("thread_db")
         user = User(**default_data)
         db.add(user)
         db.commit()
@@ -48,7 +48,7 @@ class PostMockPrecondition:
         default_data = self._default()
         if kwargs:
             default_data.update(kwargs)
-        db = inject.instance("db")
+        db = inject.instance("thread_db")
         post = Post(**default_data)
         if tags is not None:
             post.tags.extend(tags)
@@ -65,14 +65,13 @@ class CommentMockPrecondition:
             "user_id": uuid4(),
             "post_id": uuid4(),
             "content": generator.text(),
-            "name": generator.slug(),
         }
 
     def exists(self, **kwargs) -> Comment:
         default_data = self._default()
         if kwargs:
             default_data.update(kwargs)
-        db = inject.instance("db")
+        db = inject.instance("thread_db")
         comment = Comment(**default_data)
         db.add(comment)
         db.commit()
@@ -91,7 +90,7 @@ class TagMockPrecondition:
         default_data = self._default()
         if kwargs:
             default_data.update(kwargs)
-        db = inject.instance("db")
+        db = inject.instance("thread_db")
         tag = Tag(**default_data)
         db.add(tag)
         db.commit()
