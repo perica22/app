@@ -3,9 +3,9 @@ from typing import Protocol
 from sqlalchemy.orm.query import Query
 
 
-class QueryBuilderInterface(Protocol):
+class QueryIncluderInterface(Protocol):
     """
-    Interface that defines which methods each QueryBuilder needs to define.
+    Interface that defines which methods each QueryIncluder needs to define.
     """
 
     def apply(self, query: Query) -> Query:

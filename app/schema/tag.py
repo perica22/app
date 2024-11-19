@@ -8,7 +8,7 @@ class TagResponse(BaseModel):
     slug: str
 
     @classmethod
-    def create(cls, tag: Tag) -> 'TagResponse':
+    def create(cls, tag: Tag) -> "TagResponse":
         return cls(
             id=tag.id,
             slug=tag.slug,

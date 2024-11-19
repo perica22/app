@@ -8,7 +8,7 @@ class CommentResponse(BaseModel):
     content: str
 
     @classmethod
-    def create(cls, comment: Comment) -> 'CommentResponse':
+    def create(cls, comment: Comment) -> "CommentResponse":
         return cls(
             id=comment.id,
             content=comment.content,

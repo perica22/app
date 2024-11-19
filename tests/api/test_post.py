@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 
 from app.db.post import PostStatusType
 from tests.testing import AppPrecondition, AppVerificator
-from app.service.includer.query import PostQueryBuilderFactory
+from app.service.includer.query import PostQueryIncluderFactory
 
 generator = faker.Factory.create()
 
@@ -33,7 +33,7 @@ def test_get_post_successfully(
     resp_data = resp.json()
     verify.post.check_post_info(response_data=resp_data, mocked_data=post)
     # check if include values are not within response
-    for include in PostQueryBuilderFactory.query_builder_map.keys():
+    for include in PostQueryIncluderFactory.query_includer_map.keys():
         assert include not in resp_data
 
 
@@ -175,3 +175,44 @@ def test_get_post_with_includes(
                 response_data=resp_data[incl],
                 mocked_data=user
             )
+
+
+def test_get_posts_with_includes_and_status(
+    given: AppPrecondition,
+    verify: AppVerificator,
+    client: TestClient
+):
+    """
+    Test get post successfully with includes and status query parameter.
+
+    Test scenario:
+    1. Mock user, post for mocked user and comments
+    2. Create request
+    3. Verify response and each included property
+    """
+    user = given.user.exists()
+    post1 = given.post.exists(user_id=user.id)
+    post2 = given.post.exists(user_id=user.id, status=PostStatusType.ACTIVE)
+
+    given.comment.exists(user_id=user.id, post_id=post1.id)
+    comment2 = given.comment.exists(user_id=user.id, post_id=post2.id)
+    comment3 = given.comment.exists(user_id=user.id, post_id=post2.id)
+
+    resp = client.get(
+        url="/api/posts?include=comments,user&status=active"
+    )
+
+    verify.http.ok(resp)
+    resp_data = resp.json()
+    assert len(resp_data) == 1
+    verify.post.check_post_info(
+        response_data=resp_data[0], mocked_data=post2
+    )
+    verify.comment.check_comments_info(
+        response_data=resp_data[0]["comments"],
+        mocked_data=[comment2, comment3]
+    )
+    verify.user.check_user_info(
+        response_data=resp_data[0]["user"],
+        mocked_data=user
+    )

@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import ORJSONResponse
+from fastapi.middleware.gzip import GZipMiddleware
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from app.utils.middleware import DBMiddleware, AuditMiddleware
@@ -13,7 +14,7 @@ class Server:
         self.app = FastAPI(
             title="app",
             version=__version__,
-            default_response_class=JSONResponse
+            default_response_class=ORJSONResponse
         )
         self.app.include_router(
             prefix="/api/posts",
@@ -33,6 +34,7 @@ class Server:
 def attach_middlewares(app: FastAPI):
     app.add_middleware(DBMiddleware, only_success_commit=True)
     app.add_middleware(AuditMiddleware, application='app')
+    app.add_middleware(GZipMiddleware)
 
 
 def attach_error_handlers(app: FastAPI):

@@ -13,10 +13,16 @@ class Comment(Base):
 
     id = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
     post_id = Column(
-        UUID(as_uuid=True), ForeignKey("posts.id"), nullable=False
+        UUID(as_uuid=True),
+        ForeignKey("posts.id"),
+        nullable=False,
+        index=True
     )
     user_id = Column(
-        UUID(as_uuid=True), ForeignKey("users.id"), nullable=False
+        UUID(as_uuid=True),
+        ForeignKey("users.id"),
+        nullable=False,
+        index=True
     )
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)

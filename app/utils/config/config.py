@@ -43,14 +43,6 @@ class Path:
         filename = f"{self.service_name}.{self.fmt}"
         return self._get_file_path(filename)
 
-    @property
-    def data_init(self) -> str:
-        """
-        Generates the data init json file path.
-        :return: path to project data init file.
-        """
-        return self._get_file_path("data_init.json")
-
 
 class Config(Mapping):
     """

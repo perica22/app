@@ -5,7 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from tests.testing import AppPrecondition, AppVerificator
-from app.service.includer.query import UserQueryBuilderFactory
+from app.service.includer.query import UserQueryIncluderFactory
 
 generator = faker.Factory.create()
 
@@ -31,7 +31,7 @@ def test_get_user_successfully(
     resp_data = resp.json()
     verify.user.check_user_info(response_data=resp_data, mocked_data=user)
     # check if include values are not within response
-    for include in UserQueryBuilderFactory.query_builder_map.keys():
+    for include in UserQueryIncluderFactory.query_includer_map.keys():
         assert include not in resp_data
 
 

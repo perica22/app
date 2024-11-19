@@ -31,8 +31,9 @@ class AbstractResponseIncluder(ABC):
 
 
 class PostsIncluder(AbstractResponseIncluder):
+    """Responsible for attaching posts from given data to given schema."""
 
-    def attach(self, data):
+    def attach(self, data) -> None:
         self._schema.posts = [
             PostResponse.create(post=post)
             for post in data.posts
@@ -40,8 +41,9 @@ class PostsIncluder(AbstractResponseIncluder):
 
 
 class CommentsIncluder(AbstractResponseIncluder):
+    """Responsible for attaching comments from given data to given schema."""
 
-    def attach(self, data):
+    def attach(self, data) -> None:
         self._schema.comments = [
             CommentResponse.create(comment=comment)
             for comment in data.comments
@@ -49,20 +51,16 @@ class CommentsIncluder(AbstractResponseIncluder):
 
 
 class TagsIncluder(AbstractResponseIncluder):
+    """Responsible for attaching tags from given data to given schema."""
 
-    def attach(self, data):
+    def attach(self, data) -> None:
         self._schema.tags = [
             TagResponse.create(tag=tag) for tag in data.tags
         ]
 
 
 class UserIncluder(AbstractResponseIncluder):
+    """Responsible for attaching user from given data to given schema."""
 
-    def attach(self, data):
+    def attach(self, data) -> None:
         self._schema.user = UserResponse.create(user=data.user)
-
-
-class PostIncluder(AbstractResponseIncluder):
-
-    def attach(self, data):
-        self._schema.post = PostResponse.create(post=data.post)

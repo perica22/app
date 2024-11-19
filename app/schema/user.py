@@ -16,7 +16,7 @@ class UserResponse(BaseModel):
     comments: Optional[list["CommentResponse"]] = None
 
     @classmethod
-    def create(cls, user: User) -> 'UserResponse':
+    def create(cls, user: User) -> "UserResponse":
         return cls(
             id=user.id,
             first_name=user.first_name,

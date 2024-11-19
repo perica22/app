@@ -8,16 +8,12 @@ from sqlalchemy import Column, DateTime, String
 
 from app.db import Base
 if TYPE_CHECKING:
-    from app.service.includer.query import UserQueryBuilderFactory
+    from app.service.includer.query import UserQueryIncluderFactory
 
 
 class User(Base):
 
     __tablename__ = "users"
-    # TODO
-    # __table_args__ = (
-    #     Index),
-    # )
 
     id = Column(UUID(as_uuid=True), default=uuid4, primary_key=True)
     created_at = Column(
@@ -35,12 +31,12 @@ class User(Base):
         cls,
         db: Session,
         user_id: str,
-        query_builder_factory: "UserQueryBuilderFactory"
+        query_includer_factory: "UserQueryIncluderFactory"
     ) -> "User":
         query = db.query(cls).filter_by(
             id=user_id
         )
-        for qb in query_builder_factory:
+        for qb in query_includer_factory:
             query = qb.apply(query)
 
         return query.one_or_none()

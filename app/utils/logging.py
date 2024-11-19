@@ -129,11 +129,11 @@ class LoggerConnectionType:
 
 def _merge_log_configs(config, new):
     # Merge top level keys
-    if 'syslog' in new:
-        if 'syslog' not in config:
-            config['syslog'] = {}
-        for item, data in new['syslog'].items():
-            config['syslog'][item] = data
+    if "syslog" in new:
+        if "syslog" not in config:
+            config["syslog"] = {}
+        for item, data in new["syslog"].items():
+            config["syslog"][item] = data
     return config
 
 

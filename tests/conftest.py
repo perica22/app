@@ -61,9 +61,6 @@ def configure_env(
     binder.bind_to_constructor(FastAPI, Server)
     # bind services
     binder.bind(Config, mocks.config)
-    # TODO
-    # dir_path = os.path.dirname(os.path.realpath(__file__))
-    # binder.bind("DATA_INIT_FILE", f"{dir_path}/data_init.json")
 
 
 def env_kill(db_: testing.postgresql.Postgresql) -> None:

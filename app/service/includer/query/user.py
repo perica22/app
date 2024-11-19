@@ -2,10 +2,10 @@ from sqlalchemy.orm.query import Query
 from sqlalchemy.orm import subqueryload
 
 from app.db import User
-from app.service.includer.query.base import QueryBuilderInterface
+from app.service.includer.query.base import QueryIncluderInterface
 
 
-class PostsToUserQueryBuilder(QueryBuilderInterface):
+class PostsToUserQueryIncluder(QueryIncluderInterface):
 
     def apply(self, query: Query) -> Query:
         """Joins all posts that are related to user from provided query."""
@@ -16,7 +16,7 @@ class PostsToUserQueryBuilder(QueryBuilderInterface):
         )
 
 
-class CommentsToUserQueryBuilder(QueryBuilderInterface):
+class CommentsToUserQueryIncluder(QueryIncluderInterface):
 
     def apply(self, query: Query) -> Query:
         """Joins all comments that are related to user from provided query."""

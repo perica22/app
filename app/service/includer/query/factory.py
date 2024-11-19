@@ -1,56 +1,58 @@
 from abc import ABC, abstractmethod
+from collections.abc import Iterable
 
-from app.service.includer.query.base import QueryBuilderInterface
+from app.service.includer.query.base import QueryIncluderInterface
 from app.service.includer.query.post import (
-    UserToPostQueryBuilder, CommentsToPostQueryBuilder, TagsToPostQueryBuilder
+    UserToPostQueryIncluder, CommentsToPostQueryIncluder,
+    TagsToPostQueryIncluder
 )
 from app.service.includer.query.user import (
-    PostsToUserQueryBuilder, CommentsToUserQueryBuilder
+    PostsToUserQueryIncluder, CommentsToUserQueryIncluder
 )
 
 
-class AbstractQueryBuilderFactory(ABC):
+class AbstractQueryIncluderFactory(ABC):
     """
-    Abstract QueryBuilder factory object that accepts include values through
-    initialization and behaves like Iterable, producing QueryBuilder objects
-    for each include value provided using query_builder_map abstract method.
+    Abstract QueryIncluder factory object that accepts include values through
+    initialization and behaves like Iterable, producing QueryIncluder objects
+    for each include value provided from query_includer_map abstract method.
     """
     def __init__(self, include: list[str]) -> None:
         self.include = set(include).intersection(
-            set(self.query_builder_map.keys())
+            set(self.query_includer_map.keys())
         )
 
-    def __iter__(self) -> QueryBuilderInterface:
+    def __iter__(self) -> Iterable[QueryIncluderInterface]:
         """
-        Yields correct QueryBuilder object for each include value provided.
+        Yields correct QueryIncluder object for each include value provided.
         """
         for value in self.include:
-            yield self.query_builder_map[value]()
+            yield self.query_includer_map[value]()
 
     @property
     @abstractmethod
-    def query_builder_map(self) -> dict[str, type[QueryBuilderInterface]]:
+    def query_includer_map(self) -> dict[str, type[QueryIncluderInterface]]:
         """
         Abstract property that should return map with each supported include
-        filter value as key and specific QueryBuilder that holds correct build
+        filter value as key and specific QueryIncluder that holds correct build
         implementation.
         """
 
 
-class PostQueryBuilderFactory(AbstractQueryBuilderFactory):
+class PostQueryIncluderFactory(AbstractQueryIncluderFactory):
     """Factory for Post model relationships."""
 
-    query_builder_map = {
-        "user": UserToPostQueryBuilder,
-        "comments": CommentsToPostQueryBuilder,
-        "tags": TagsToPostQueryBuilder
+    query_includer_map = {
+        "user": UserToPostQueryIncluder,
+        "comments": CommentsToPostQueryIncluder,
+        "tags": TagsToPostQueryIncluder
     }
 
 
-class UserQueryBuilderFactory(AbstractQueryBuilderFactory):
+class UserQueryIncluderFactory(AbstractQueryIncluderFactory):
     """Factory for User model relationships."""
 
-    query_builder_map = {
-        "posts": PostsToUserQueryBuilder,
-        "comments": CommentsToUserQueryBuilder
+    query_includer_map = {
+        "posts": PostsToUserQueryIncluder,
+        "comments": CommentsToUserQueryIncluder
     }

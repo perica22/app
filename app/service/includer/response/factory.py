@@ -1,5 +1,7 @@
+from collections.abc import Iterable
+
 from app.service.includer.response.includer import (
-    AbstractResponseIncluder, PostIncluder, CommentsIncluder, UserIncluder,
+    AbstractResponseIncluder, CommentsIncluder, UserIncluder,
     TagsIncluder, PostsIncluder
 )
 
@@ -10,17 +12,16 @@ class ResponseIncluderFactory:
     initialization and behaves like Iterable, producing ResponseIncluder
     objects for each include value provided using includer_map attribute.
     """
-    includer_map: dict[str, AbstractResponseIncluder] = {
+    response_includer_map: dict[str, AbstractResponseIncluder] = {
         "posts": PostsIncluder,
         "comments": CommentsIncluder,
         "user": UserIncluder,
         "tags": TagsIncluder,
-        "post": PostIncluder
     }
 
     def __init__(self, include: set[str]) -> None:
         self._include = include
 
-    def __iter__(self) -> type[AbstractResponseIncluder]:
+    def __iter__(self) -> Iterable[type[AbstractResponseIncluder]]:
         for incl in self._include:
-            yield self.includer_map[incl]
+            yield self.response_includer_map[incl]

@@ -1,6 +1,8 @@
 from __future__ import with_statement
+import os
+
 from alembic import context
-from sqlalchemy import pool, engine_from_config
+from sqlalchemy import pool, create_engine
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -21,6 +23,9 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL environment variable is not set.")
 
 
 def run_migrations_offline():
@@ -47,13 +52,10 @@ def run_migrations_online():
 
     In this scenario we need to create an Engine
     and associate a connection with the context.
-
     """
-    # TODO: make db connection string secret
-    engine = engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool
+    engine = create_engine(
+        DATABASE_URL,
+        poolclass=pool.NullPool,
     )
 
     connection = engine.connect()
