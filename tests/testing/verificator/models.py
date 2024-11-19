@@ -60,6 +60,8 @@ class CommentVerificator(Verificator):
         provided values.
         """
         assert response_data["id"] == str(mocked_data.id)
+        assert response_data["user_id"] == str(mocked_data.user_id)
+        assert response_data["post_id"] == str(mocked_data.post_id)
         assert response_data["content"] == str(mocked_data.content)
 
     def check_comments_info(

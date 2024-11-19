@@ -1,0 +1,24 @@
+application: app
+debug: true
+
+server:
+  host: 127.0.0.1
+  port: 9898
+  allowed_origins:
+    - 127.0.0.1
+    - localhost
+
+logging:
+  syslog:
+    connection_type: port
+    host: host
+
+database:
+  type: postgresql
+  host: localhost
+  port: 5432
+  database: app
+  username: app
+  password: app123
+  pool_size: 5
+  ssl: false

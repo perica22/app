@@ -72,4 +72,3 @@ venv/
 test-report/
 .pytest_cache
 .coverage
-config/
