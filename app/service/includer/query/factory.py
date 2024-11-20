@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from collections.abc import Iterable
+from enum import Enum
 
 from app.service.includer.query.base import QueryIncluderInterface
 from app.service.includer.query.post import (
@@ -17,17 +18,16 @@ class AbstractQueryIncluderFactory(ABC):
     initialization and behaves like Iterable, producing QueryIncluder objects
     for each include value provided from query_includer_map abstract method.
     """
-    def __init__(self, include: list[str]) -> None:
-        self.include = set(include).intersection(
-            set(self.query_includer_map.keys())
-        )
+
+    def __init__(self, include: list[Enum]) -> None:
+        self.include = include
 
     def __iter__(self) -> Iterable[QueryIncluderInterface]:
         """
         Yields correct QueryIncluder object for each include value provided.
         """
         for value in self.include:
-            yield self.query_includer_map[value]()
+            yield self.query_includer_map[value.value]()
 
     @property
     @abstractmethod
@@ -43,9 +43,9 @@ class PostQueryIncluderFactory(AbstractQueryIncluderFactory):
     """Factory for Post model relationships."""
 
     query_includer_map = {
-        "user": UserToPostQueryIncluder,
-        "comments": CommentsToPostQueryIncluder,
-        "tags": TagsToPostQueryIncluder
+        "USER": UserToPostQueryIncluder,
+        "COMMENTS": CommentsToPostQueryIncluder,
+        "TAGS": TagsToPostQueryIncluder
     }
 
 
@@ -53,6 +53,6 @@ class UserQueryIncluderFactory(AbstractQueryIncluderFactory):
     """Factory for User model relationships."""
 
     query_includer_map = {
-        "posts": PostsToUserQueryIncluder,
-        "comments": CommentsToUserQueryIncluder
+        "POSTS": PostsToUserQueryIncluder,
+        "COMMENTS": CommentsToUserQueryIncluder
     }

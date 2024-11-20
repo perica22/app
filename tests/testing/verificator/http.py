@@ -36,6 +36,7 @@ class HttpChecker:
     # client error
     bad_request = p(_status_check, 400)
     not_found = p(_status_check, 404)
+    validation_error = p(_status_check, 422)
 
 
 class HttpVerificator(Verificator):

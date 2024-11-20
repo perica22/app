@@ -55,6 +55,14 @@ class PostNotFound(HTTPException):
 class InvalidPostStatus(HTTPException):
     def __init__(self):
         super().__init__(
-            status_code=400,
+            status_code=422,
             detail="Provided post status is not valid"
+        )
+
+
+class InvalidIncludeValue(HTTPException):
+    def __init__(self):
+        super().__init__(
+            status_code=422,
+            detail="Provided include value is not valid"
         )

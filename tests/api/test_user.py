@@ -52,7 +52,7 @@ def test_get_user_not_found(
 
 
 @pytest.mark.parametrize(
-    "include", ["posts,comments", "posts,test", "comments"]
+    "include", ["posts,comments", "posts", "comments"]
 )
 def test_get_user_with_includes(
     given: AppPrecondition,
@@ -80,6 +80,7 @@ def test_get_user_with_includes(
     resp = client.get(url=f"/api/users/{str(user.id)}?include={include}")
 
     verify.http.ok(resp)
+
     resp_data = resp.json()
     verify.user.check_user_info(
         response_data=resp_data,
@@ -96,3 +97,25 @@ def test_get_user_with_includes(
                 response_data=resp_data[incl],
                 mocked_data=[comment1, comment2, comment3]
             )
+
+
+@pytest.mark.parametrize(
+    "include", ["posts,test", "tests"]
+)
+def test_get_user_with_invalid_includes(
+    given: AppPrecondition,
+    verify: AppVerificator,
+    client: TestClient,
+    include: str
+):
+    """
+    Test get user with invalid include values.
+
+    Test scenario:
+    1. Mock user
+    2. Create request with include query parameter
+    3. Verify user response
+    """
+    user = given.user.exists()
+    resp = client.get(url=f"/api/users/{str(user.id)}?include={include}")
+    verify.http.validation_error(resp)

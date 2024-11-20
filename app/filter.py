@@ -1,4 +1,5 @@
 from typing import Any
+from enum import Enum
 
 from fastapi import Query, Depends
 
@@ -46,10 +47,22 @@ class IncludeFilter:
         examples=["comments,tags", "tags", "user"],
     )
 
+    def __init__(self, entity: type[Enum]) -> None:
+        self.entity = entity
+
     def __call__(self, include: str = INCLUDE_QUERY) -> "IncludeFilter":
-        self.value = include.split(",") if include is not None else []
+        """
+        Parses the string of include values and validates if each of them is
+        supported by checking its existence in provide enum through object
+        initialization.
+        """
+        values = set(include.split(",")) if include is not None else set()
+        try:
+            self.value = [self.entity(value.upper()) for value in values]
+        except ValueError:
+            raise errors.InvalidIncludeValue()
         return self
 
     @classmethod
-    def inject(cls) -> Any:
-        return Depends(cls())
+    def inject(cls, entity: type[Enum]) -> Any:
+        return Depends(cls(entity=entity))

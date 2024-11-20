@@ -5,6 +5,7 @@ from app import event
 from app.schema import PostResponse
 from app.service import PostService
 from app.filter import PostStatusFilter, IncludeFilter
+from app.enum import PostIncludeFilter
 
 router = APIRouter()
 
@@ -20,7 +21,9 @@ router = APIRouter()
 def list_posts(
     request: Request,
     status_filter: PostStatusFilter = PostStatusFilter.inject(),
-    include_filter: IncludeFilter = IncludeFilter.inject()
+    include_filter: IncludeFilter = IncludeFilter.inject(
+        entity=PostIncludeFilter
+    )
 ) -> list[PostResponse]:
     posts = PostService(
         db=request.state.db,
@@ -44,7 +47,9 @@ def list_posts(
 def get_post(
     request: Request,
     post_id: UUID4,
-    include_filter: IncludeFilter = IncludeFilter.inject()
+    include_filter: IncludeFilter = IncludeFilter.inject(
+        entity=PostIncludeFilter
+    )
 ) -> PostResponse:
     post = PostService(
         db=request.state.db,

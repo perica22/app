@@ -92,7 +92,7 @@ def test_list_posts_invalid_status_filter(
     2. Verify response
     """
     resp = client.get(url="/api/posts?status=test")
-    verify.http.bad_request(resp)
+    verify.http.validation_error(resp)
 
 
 def test_list_posts_with_status_filter(
@@ -126,7 +126,7 @@ def test_list_posts_with_status_filter(
 
 
 @pytest.mark.parametrize(
-    "include", ["user,comments,tags", "user,test", "comments"]
+    "include", ["user,comments,tags", "user", "comments"]
 )
 def test_get_post_with_includes(
     given: AppPrecondition,
@@ -175,6 +175,26 @@ def test_get_post_with_includes(
                 response_data=resp_data[incl],
                 mocked_data=user
             )
+
+
+@pytest.mark.parametrize(
+    "include", ["user,comments,tags, test", "tests"]
+)
+def test_get_post_with_invalid_includes(
+    given: AppPrecondition,
+    verify: AppVerificator,
+    client: TestClient,
+    include: str
+):
+    """
+    Test get post with invalid includes.
+
+    Test scenario:
+    1. Create request with invalid include values
+    2. Verify response
+    """
+    resp = client.get(url=f"/api/posts?include={include}")
+    verify.http.validation_error(resp)
 
 
 def test_get_posts_with_includes_and_status(

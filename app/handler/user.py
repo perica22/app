@@ -5,6 +5,7 @@ from app import event
 from app.schema import UserResponse
 from app.service import UserService
 from app.filter import IncludeFilter
+from app.enum import UserIncludeFilter
 
 router = APIRouter()
 
@@ -20,7 +21,9 @@ router = APIRouter()
 def get_user(
     request: Request,
     user_id: UUID4,
-    include_filter: IncludeFilter = IncludeFilter.inject()
+    include_filter: IncludeFilter = IncludeFilter.inject(
+        entity=UserIncludeFilter
+    )
 ) -> UserResponse:
     user = UserService(
         db=request.state.db,
